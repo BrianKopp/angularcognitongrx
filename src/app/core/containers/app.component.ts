@@ -4,7 +4,8 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   selector: 'app-core',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-  <div>ZOINKS</div>
+  <h1>ZOINKS</h1>
+  <router-outlet></router-outlet>
   `
 })
 export class AppComponent implements OnInit {
