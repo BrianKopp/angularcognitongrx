@@ -8,6 +8,10 @@ export const routes: Routes = [
     path: 'protected',
     loadChildren: './protected-content/protected-content.module#ProtectedContentModule'
   },
+  {
+    path: 'auth',
+    loadChildren: './auth/auth.module#AuthModule'
+  },
   { path: '**', component: NotFoundPageComponent }
 ];
 

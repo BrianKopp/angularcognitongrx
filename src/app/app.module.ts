@@ -1,3 +1,5 @@
+import { EffectsModule } from '@ngrx/effects';
+import { AuthModule } from './auth/auth.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
@@ -10,14 +12,18 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { reducers } from './reducers';
 import { metaReducers } from './reducers/index';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   imports: [
+    CommonModule,
     BrowserModule,
     CoreModule,
+    AuthModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, { metaReducers}),
-    StoreRouterConnectingModule.forRoot()
+    EffectsModule.forRoot([]),
+    StoreRouterConnectingModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent]
