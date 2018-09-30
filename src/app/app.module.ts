@@ -1,3 +1,4 @@
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -15,6 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { reducers } from './reducers';
 import { metaReducers } from './reducers/index';
+import { environment } from '../environments/environment.prod';
 
 @NgModule({
   imports: [
@@ -27,6 +29,10 @@ import { metaReducers } from './reducers/index';
     StoreModule.forRoot(reducers, { metaReducers}),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
+    StoreDevtoolsModule.instrument({
+      name: 'Cognito App',
+      logOnly: environment.production,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent]
