@@ -9,6 +9,7 @@ export interface State {
   CurrentUser: CognitoUser | null;
   AccessToken: string | null;
   IdToken: string | null;
+  ErrorMessage: string | null;
 }
 
 const initialState: State = {
@@ -17,7 +18,8 @@ const initialState: State = {
   LoggingOut: false,
   CurrentUser: null,
   AccessToken: null,
-  IdToken: null
+  IdToken: null,
+  ErrorMessage: null
 };
 
 export function reducer(state: State = initialState, action: actions.Actions): State {
@@ -32,7 +34,8 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         LoggedIn: true,
         CurrentUser: sa.payload.user,
         AccessToken: sa.payload.accessToken,
-        IdToken: sa.payload.idToken
+        IdToken: sa.payload.idToken,
+        ErrorMessage: null
       };
     case actions.LOGIN_USER_ERROR:
       const ea = action as actions.LoginUserErrorAction;
@@ -42,7 +45,8 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         LoggedIn: false,
         CurrentUser: null,
         AccessToken: null,
-        IdToken: null
+        IdToken: null,
+        ErrorMessage: 'Super error'
       };
     case actions.LOGOUT_USER:
       return {
@@ -70,3 +74,4 @@ export function reducer(state: State = initialState, action: actions.Actions): S
 export const isAuthenticated = (state: State) => state.LoggedIn;
 export const getAuthenticatedUser = (state: State) => state.CurrentUser;
 export const isLoading = (state: State) => state.LoggingIn || state.LoggingOut;
+export const getError = (state: State) => state.ErrorMessage;

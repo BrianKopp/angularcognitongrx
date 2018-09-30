@@ -1,5 +1,5 @@
 import { Credentials } from './../../models/credentials';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
@@ -8,7 +8,9 @@ import { FormGroup, FormControl } from '@angular/forms';
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent implements OnInit {
+  @Input() errorMessage: string | null;
   @Output() submitted = new EventEmitter<Credentials>();
+  
   form: FormGroup = new FormGroup({
     username: new FormControl(''),
     password: new FormControl(''),

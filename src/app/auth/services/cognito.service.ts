@@ -1,7 +1,7 @@
-import { Observable } from 'rxjs';
+import { Observable, of, throwError, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult } from 'amazon-cognito-identity-js';
+import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { environment } from '../../../environments/environment';
 import { SignUpData } from '../models/signupdata';
 
@@ -10,8 +10,11 @@ export const PoolData = {
   UserPoolId: environment.cognitoUserPoolId
 };
 
-export class CognitoLoginInfo {
-  constructor(public cognitoUser: CognitoUser, public accessToken: string, public idToken: string) {}
+export interface CognitoLoginInfo {
+  cognitoUser: CognitoUser | null;
+  accessToken: string | null;
+  idToken: string | null;
+  error: string | null;
 }
 
 @Injectable({
@@ -21,7 +24,7 @@ export class CognitoService {
 
   constructor() { }
 
-  loginUser(username: string, password: string): Observable<CognitoLoginInfo> {
+  loginUser(username: string, password: string) : Observable<CognitoLoginInfo> {
     const authenticationData = {
       Username: username,
       Password: password
@@ -34,17 +37,27 @@ export class CognitoService {
       Pool: userPool
     };
     const cognitoUser = new CognitoUser(userData);
+
+    // create a subject for this
+    let authSubject = new Subject<CognitoLoginInfo>();
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (result) => {
         const accessToken = result.getAccessToken().getJwtToken();
         const idToken = result.getIdToken().getJwtToken();
-        return new CognitoLoginInfo(cognitoUser, accessToken, idToken);
+        console.log(`successfully logged in user ${cognitoUser.getUsername()}`);
+        authSubject.next({
+          cognitoUser: cognitoUser,
+          accessToken: accessToken,
+          idToken: idToken,
+          error: null
+        });
       },
       onFailure: (err) => {
-        return Observable.throw(new Error(err));
+        console.log(`error logging in user: ${err}`)
+        authSubject.error(err);
       }
     });
-    return Observable.throw(new Error('loginUser did not complete successfully'));
+    return authSubject.asObservable();
   }
   signUpUser(signUpData: SignUpData) {
     const pool = new CognitoUserPool(PoolData);

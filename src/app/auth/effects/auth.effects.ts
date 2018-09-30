@@ -1,11 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
-import { Observable, of } from "rxjs";
-import { Router } from '@angular/router';
-import { map, switchMap, catchError, tap } from 'rxjs/operators';
+import { Action, select } from '@ngrx/store';
+import { Observable, of, from } from "rxjs";
+import { map, switchMap, catchError, tap, merge, pluck, mergeMap,  } from 'rxjs/operators';
 
-import { CognitoService } from '../services/cognito.service';
+import { CognitoService, CognitoLoginInfo } from '../services/cognito.service';
 import {
   LOGIN_USER,
   LOGOUT_USER,
@@ -23,20 +22,33 @@ import {
 export class AuthorizationEffects {
     constructor(
       private actions: Actions,
-      private router: Router,
       private cognitoService: CognitoService
     ){}
 
     @Effect()
     public loginUser: Observable<Action> = this.actions.ofType<LoginUserAction>(LOGIN_USER).pipe(
-      map(action => action.payload),
-      switchMap(credentials => this.cognitoService.loginUser(credentials.username, credentials.password)),
-      map(info => new LoginUserSuccessAction({
-        user: info.cognitoUser,
-        accessToken: info.accessToken,
-        idToken: info.idToken
-      })),
-      catchError(error => of(new LoginUserErrorAction(error)))
+      switchMap(
+        action => this.cognitoService.loginUser(action.payload.username, action.payload.password)
+        .pipe(
+          map(info => new LoginUserSuccessAction({
+            user: info.cognitoUser,
+            accessToken: info.accessToken,
+            idToken: info.idToken
+          }))
+        )
+      ),
+      catchError(err => of(new LoginUserErrorAction({error: 'wtf'})))
+      // map(action => action.payload),
+      // mergeMap(credentials => this.cognitoService.loginUser(credentials.username, credentials.password)),
+      // map(info => new LoginUserSuccessAction({user: info.cognitoUser, accessToken: info.accessToken, idToken: info.idToken})),
+      // catchError(err => new LoginUserErrorAction({error: 'wtf'}))
+      // map(credentials => this.cognitoService.loginUser(credentials.username, credentials.password).subscribe(
+      //   next: (value: CognitoLoginInfo) => new LoginUserSuccessAction(),
+      //   error: (error: any) => 0,
+      // )
+      //   (info => new LoginUserSuccessAction({user: info.cognitoUser, accessToken: info.accessToken, idToken: info.idToken}))
+      // )),
+      // pluck(i => i)
     );
     
     @Effect()

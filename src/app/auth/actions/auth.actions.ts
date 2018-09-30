@@ -23,7 +23,7 @@ export class LoginUserSuccessAction implements Action {
 
 export class LoginUserErrorAction implements Action {
     public type: string = LOGIN_USER_ERROR;
-    constructor(public payload?: any) {}
+    constructor(public payload: {error: any}) {}
 }
 
 export class LogoutUserAction implements Action {

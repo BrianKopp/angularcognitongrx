@@ -14,8 +14,7 @@ import { AuthModule } from './auth/auth.module';
 
 import { AppRoutingModule } from './app-routing.module';
 
-import { reducers } from './reducers';
-import { metaReducers } from './reducers/index';
+import { reducers, metaReducers } from './reducers';
 import { environment } from '../environments/environment.prod';
 
 @NgModule({
@@ -26,7 +25,7 @@ import { environment } from '../environments/environment.prod';
     CoreModule,
     AuthModule,
     AppRoutingModule,
-    StoreModule.forRoot(reducers, { metaReducers}),
+    StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot(),
     StoreDevtoolsModule.instrument({

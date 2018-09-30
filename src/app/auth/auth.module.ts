@@ -4,13 +4,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
 
-import { reducers } from '../reducers';
+
 import { AuthorizationEffects } from './effects/auth.effects';
 import { AuthRoutingModule } from './auth-routing.module';
 import { CoreModule } from '../core/core.module';
 import { LoginPageComponent } from './containers/login-page/login-page.component';
 import { LoginFormComponent } from './components/login-form/login-form.component';
 import { MaterialModule } from '../material';
+import { reducer } from './reducers/auth.reducer';
 
 @NgModule({
   imports: [
@@ -19,7 +20,7 @@ import { MaterialModule } from '../material';
     CoreModule,
     MaterialModule,
     AuthRoutingModule,
-    StoreModule.forFeature('auth', reducers),
+    StoreModule.forFeature('auth', reducer),
     EffectsModule.forFeature([AuthorizationEffects])
   ],
   declarations: [LoginPageComponent, LoginFormComponent]

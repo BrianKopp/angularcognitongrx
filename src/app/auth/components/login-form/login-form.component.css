@@ -19,3 +19,10 @@ mat-card-content {
   flex-direction: row;
   justify-content: flex-end;
 }
+
+.loginError {
+  padding: 16px;
+  width: 300px;
+  color: white;
+  background-color: red;
+}

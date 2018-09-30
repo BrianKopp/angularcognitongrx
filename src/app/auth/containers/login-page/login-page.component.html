@@ -1,3 +1,4 @@
 <app-login-form
-  (submitted)="onSubmit($event)">
+  (submitted)="onSubmit($event)"
+  [errorMessage]="error$ | async">
 </app-login-form>
