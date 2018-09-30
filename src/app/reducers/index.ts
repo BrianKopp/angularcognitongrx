@@ -4,15 +4,18 @@ import { storeFreeze } from 'ngrx-store-freeze';
 
 import { environment } from '../../environments/environment.prod';
 import * as fromLayout from '../core/reducers/layout.reducer';
+import * as fromAuth from '../auth/reducers/auth.reducer';
 
 export interface State {
   router: fromRouter.RouterReducerState;
   layout: fromLayout.State;
+  auth: fromAuth.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
   router: fromRouter.routerReducer,
   layout: fromLayout.reducer,
+  auth: fromAuth.reducer
 };
 
 // log all actions
@@ -42,3 +45,11 @@ export const getShowSidenav = createSelector(
   fromLayout.getShowSidenav
 );
 
+export const getAuthState = createFeatureSelector<State, fromAuth.State>(
+  'auth'
+);
+
+export const isAuthenticated = createSelector(
+  getAuthState,
+  fromAuth.isAuthenticated
+);

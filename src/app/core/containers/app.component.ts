@@ -4,7 +4,6 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import * as fromRoot from '../../reducers';
-import * as fromAuth from '../../auth/reducers';
 import * as layoutActions from '../actions/layout.actions';
 
 @Component({
@@ -40,7 +39,7 @@ export class AppComponent implements OnInit {
 
   constructor(private store: Store<fromRoot.State>) {
     this.showSidenav$ = this.store.pipe(select(fromRoot.getShowSidenav));
-    this.loggenIn$ = this.store.pipe(select(fromAuth.getIsAuthenticated));
+    this.loggenIn$ = this.store.pipe(select(fromRoot.isAuthenticated));
   }
 
   ngOnInit() {
