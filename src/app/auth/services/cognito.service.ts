@@ -1,11 +1,13 @@
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import { CognitoUser, AuthenticationDetails, CognitoUserPool } from 'amazon-cognito-identity-js';
+import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult } from 'amazon-cognito-identity-js';
+import { environment } from '../../../environments/environment';
+import { SignUpData } from '../models/signupdata';
 
 export const PoolData = {
-  ClientId: '',
-  UserPoolId: ''
+  ClientId: environment.cognitoAppClientId,
+  UserPoolId: environment.cognitoUserPoolId
 };
 
 export class CognitoLoginInfo {
@@ -43,6 +45,36 @@ export class CognitoService {
       }
     });
     return Observable.throw(new Error('loginUser did not complete successfully'));
+  }
+  signUpUser(signUpData: SignUpData) {
+    const pool = new CognitoUserPool(PoolData);
+    var attributeList = []
+    attributeList.push(new CognitoUserAttribute({
+      Name: 'email',
+      Value: signUpData.emailAddress
+    }));
+    attributeList.push(new CognitoUserAttribute({
+      Name: 'given_name',
+      Value: signUpData.firstName
+    }));
+    attributeList.push(new CognitoUserAttribute({
+      Name: 'family_name',
+      Value: signUpData.lastName
+    }));
+    pool.signUp(
+      signUpData.username,
+      signUpData.password,
+      attributeList,
+      null,
+      (err: Error, result: ISignUpResult) => {
+        if (err) {
+          alert(err);
+          return;
+        }
+        console.log('successfully signed up user', result.user);
+        console.log('username', result.user.getUsername());
+      }
+    )
   }
   logoutUser(user: CognitoUser, logoutGlobally: boolean = false) {
     if (logoutGlobally) {
