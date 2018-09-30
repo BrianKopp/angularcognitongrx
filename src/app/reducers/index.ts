@@ -1,15 +1,18 @@
+import { ActionReducerMap, ActionReducer, MetaReducer, createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromRouter from '@ngrx/router-store';
-import { ActionReducerMap, ActionReducer, MetaReducer } from '@ngrx/store';
 import { storeFreeze } from 'ngrx-store-freeze';
 
 import { environment } from '../../environments/environment.prod';
+import * as fromLayout from '../core/reducers/layout.reducer';
 
 export interface State {
   router: fromRouter.RouterReducerState;
+  layout: fromLayout.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
   router: fromRouter.routerReducer,
+  layout: fromLayout.reducer,
 };
 
 // log all actions
@@ -29,3 +32,13 @@ export function logger(reducer: ActionReducer<State>): ActionReducer<State> {
 export const metaReducers: MetaReducer<State>[] = !environment.production
   ? [storeFreeze]
   : [];
+
+export const getLayoutState = createFeatureSelector<State, fromLayout.State>(
+  'layout'
+);
+
+export const getShowSidenav = createSelector(
+  getLayoutState,
+  fromLayout.getShowSidenav
+);
+

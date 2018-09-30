@@ -7,10 +7,12 @@ import { reducers } from '../reducers';
 import { AuthorizationEffects } from './effects/auth.effects';
 import { LoginComponent } from './components/login/login.component';
 import { AuthRoutingModule } from './auth-routing.module';
+import { CoreModule } from '../core/core.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    CoreModule,
     AuthRoutingModule,
     StoreModule.forFeature('auth', reducers),
     EffectsModule.forFeature([AuthorizationEffects])

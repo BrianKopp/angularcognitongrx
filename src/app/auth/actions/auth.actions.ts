@@ -1,6 +1,6 @@
 import { CognitoUser } from 'amazon-cognito-identity-js';
 import { Action } from '@ngrx/store';
-import { createActionType } from "../shared/utils";
+import { createActionType } from '../../core/shared/utils';
 
 
 export const LOGIN_USER = createActionType('LOGIN_USER');
