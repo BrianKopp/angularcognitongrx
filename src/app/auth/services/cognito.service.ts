@@ -53,7 +53,8 @@ export class CognitoService {
         });
       },
       onFailure: (err) => {
-        console.log(`error logging in user: ${err}`)
+        console.log('error logging in user:')
+        console.log(err);
         authSubject.error(err);
       }
     });

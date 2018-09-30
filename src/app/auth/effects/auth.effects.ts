@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { Action, select } from '@ngrx/store';
 import { Observable, of, from } from "rxjs";
-import { map, switchMap, catchError, tap, merge, pluck, mergeMap,  } from 'rxjs/operators';
+import { map, switchMap, catchError, tap, merge, pluck, mergeMap, concatMap,  } from 'rxjs/operators';
 
 import { CognitoService, CognitoLoginInfo } from '../services/cognito.service';
 import {
@@ -34,10 +34,10 @@ export class AuthorizationEffects {
             user: info.cognitoUser,
             accessToken: info.accessToken,
             idToken: info.idToken
-          }))
+          })),
+          catchError(err => of(new LoginUserErrorAction({error: 'wtf'})))
         )
       ),
-      catchError(err => of(new LoginUserErrorAction({error: 'wtf'})))
       // map(action => action.payload),
       // mergeMap(credentials => this.cognitoService.loginUser(credentials.username, credentials.password)),
       // map(info => new LoginUserSuccessAction({user: info.cognitoUser, accessToken: info.accessToken, idToken: info.idToken})),
