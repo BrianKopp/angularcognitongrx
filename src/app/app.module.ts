@@ -1,18 +1,19 @@
-import { EffectsModule } from '@ngrx/effects';
-import { AuthModule } from './auth/auth.module';
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { StoreModule } from '@ngrx/store';
+import { BrowserModule } from '@angular/platform-browser';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { StoreModule } from '@ngrx/store';
 
 import { CoreModule } from './core/core.module';
 import { AppComponent } from './core/containers/app.component';
+
+import { AuthModule } from './auth/auth.module';
 
 import { AppRoutingModule } from './app-routing.module';
 
 import { reducers } from './reducers';
 import { metaReducers } from './reducers/index';
-import { CommonModule } from '@angular/common';
 
 @NgModule({
   imports: [

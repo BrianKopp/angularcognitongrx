@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './containers/app.component';
 import { NotFoundPageComponent } from './containers/not-found-page.component';
+import { LayoutComponent } from './components/layout.component';
 
 export const COMPONENTS = [
   AppComponent,
-  NotFoundPageComponent
+  NotFoundPageComponent,
+  LayoutComponent
 ]
 
 @NgModule({
@@ -14,6 +16,6 @@ export const COMPONENTS = [
     CommonModule,
     RouterModule
   ],
-  declarations: [COMPONENTS]
+  declarations: [COMPONENTS, LayoutComponent]
 })
 export class CoreModule { }
