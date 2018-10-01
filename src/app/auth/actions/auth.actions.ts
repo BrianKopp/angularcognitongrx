@@ -53,7 +53,7 @@ export class SignupUserAction implements Action {
 
 export class SignupUserSuccessAction implements Action {
   public type: string = SIGNUP_USER_SUCCESS;
-  constructor(public payload?: any) {}
+  constructor(public payload: {user: CognitoUser}) {}
 }
 
 export class SignupUserErrorAction implements Action {

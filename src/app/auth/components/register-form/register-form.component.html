@@ -32,6 +32,9 @@
           <input type="password" matInput placeholder="Confirm Pasword" formControlName="passwordConfirm">
         </mat-form-field>
       </p>
+      <p *ngIf="errorMessage" class="registerError">
+          {{ errorMessage }}
+        </p>
       <p class="registerButtons">
         <button type="submit" mat-button>Sign-up</button>
       </p>

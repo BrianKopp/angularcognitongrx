@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
 import * as fromAuth from '../../reducers/auth.reducer';
 import { RegisterFormData } from '../../models/registerformdata';
+import { SignupUserAction } from '../../actions/auth.actions';
 
 @Component({
   selector: 'app-register-page',
@@ -10,7 +11,7 @@ import { RegisterFormData } from '../../models/registerformdata';
   styleUrls: ['./register-page.component.css']
 })
 export class RegisterPageComponent implements OnInit {
-  error$ = null;
+  error$ = this.store.pipe(select(fromAuth.getError));
 
   constructor(private store: Store<fromAuth.AuthState>) { }
 
@@ -18,7 +19,6 @@ export class RegisterPageComponent implements OnInit {
   }
 
   onSubmit(formData: RegisterFormData) {
-    console.log('received submit action');
+    this.store.dispatch(new SignupUserAction({data: formData}));
   }
-
 }

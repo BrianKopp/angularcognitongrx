@@ -74,8 +74,10 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         ErrorMessage: a.payload.error
       }
     case actions.SIGNUP_USER_SUCCESS:
+      const sus = action as actions.SignupUserSuccessAction;
       return {
         ...state,
+        CurrentUser: sus.payload.user,
         ErrorMessage: null
       }
     default: return state;

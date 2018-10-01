@@ -103,7 +103,7 @@ export class CognitoService {
       (err: Error, result: ISignUpResult) => {
         if (err) {
           console.log(err);
-          registerSubject.error('there was an error registering');
+          registerSubject.error(err.message);
           return;
         }
         console.log('successfully signed up user', result.user);

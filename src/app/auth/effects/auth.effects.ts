@@ -51,12 +51,13 @@ export class AuthorizationEffects {
       map( _ => new LogoutUserSuccessAction()),
       catchError(error => of(new LogoutUserErrorAction(error)))
     );
+    
     @Effect()
     public signupUser: Observable<Action> = this.actions.ofType<SignupUserAction>(SIGNUP_USER).pipe(
       map(action => action.payload.data),
       switchMap(
         data => this.cognitoService.signUpUser(data).pipe(
-          map(info => new SignupUserSuccessAction(info)),
+          map(user => new SignupUserSuccessAction({user: user})),
           catchError(err => of(new SignupUserErrorAction({error: err})))
         )
       )
