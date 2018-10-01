@@ -13,6 +13,7 @@ import { LoginFormComponent } from './components/login-form/login-form.component
 import { MaterialModule } from '../material';
 import { reducer } from './reducers/auth.reducer';
 import { RegisterFormComponent } from './components/register-form/register-form.component';
+import { RegisterPageComponent } from './containers/register-page/register-page.component';
 
 @NgModule({
   imports: [
@@ -24,6 +25,6 @@ import { RegisterFormComponent } from './components/register-form/register-form.
     StoreModule.forFeature('auth', reducer),
     EffectsModule.forFeature([AuthorizationEffects])
   ],
-  declarations: [LoginPageComponent, LoginFormComponent, RegisterFormComponent]
+  declarations: [LoginPageComponent, LoginFormComponent, RegisterFormComponent, RegisterPageComponent]
 })
 export class AuthModule { }
