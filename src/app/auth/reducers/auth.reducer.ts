@@ -67,6 +67,17 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         ...state,
         LoggingOut: false
       };
+    case actions.SIGNUP_USER_ERROR:
+      const a = action as actions.SignupUserErrorAction;
+      return {
+        ...state,
+        ErrorMessage: a.payload.error
+      }
+    case actions.SIGNUP_USER_SUCCESS:
+      return {
+        ...state,
+        ErrorMessage: null
+      }
     default: return state;
   }
 }

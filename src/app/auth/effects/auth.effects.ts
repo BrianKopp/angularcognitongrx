@@ -15,6 +15,10 @@ import {
   LogoutUserAction,
   LogoutUserSuccessAction,
   LogoutUserErrorAction,
+  SignupUserAction,
+  SIGNUP_USER,
+  SignupUserSuccessAction,
+  SignupUserErrorAction,
 } from '../actions/auth.actions';
 
 
@@ -37,18 +41,7 @@ export class AuthorizationEffects {
           })),
           catchError(err => of(new LoginUserErrorAction({error: err})))
         )
-      ),
-      // map(action => action.payload),
-      // mergeMap(credentials => this.cognitoService.loginUser(credentials.username, credentials.password)),
-      // map(info => new LoginUserSuccessAction({user: info.cognitoUser, accessToken: info.accessToken, idToken: info.idToken})),
-      // catchError(err => new LoginUserErrorAction({error: 'wtf'}))
-      // map(credentials => this.cognitoService.loginUser(credentials.username, credentials.password).subscribe(
-      //   next: (value: CognitoLoginInfo) => new LoginUserSuccessAction(),
-      //   error: (error: any) => 0,
-      // )
-      //   (info => new LoginUserSuccessAction({user: info.cognitoUser, accessToken: info.accessToken, idToken: info.idToken}))
-      // )),
-      // pluck(i => i)
+      )
     );
     
     @Effect()
@@ -57,5 +50,15 @@ export class AuthorizationEffects {
       map(payload => this.cognitoService.logoutUser(payload.user, payload.logoutGlobally)),
       map( _ => new LogoutUserSuccessAction()),
       catchError(error => of(new LogoutUserErrorAction(error)))
+    );
+    @Effect()
+    public signupUser: Observable<Action> = this.actions.ofType<SignupUserAction>(SIGNUP_USER).pipe(
+      map(action => action.payload.data),
+      switchMap(
+        data => this.cognitoService.signUpUser(data).pipe(
+          map(info => new SignupUserSuccessAction(info)),
+          catchError(err => of(new SignupUserErrorAction({error: err})))
+        )
+      )
     );
 }

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult } from 'amazon-cognito-identity-js';
 import { environment } from '../../../environments/environment';
-import { SignUpData } from '../models/signupdata';
+import { RegisterFormData } from '../models/registerformdata';
 
 export const PoolData = {
   ClientId: environment.cognitoAppClientId,
@@ -77,12 +77,13 @@ export class CognitoService {
     });
     return authSubject.asObservable();
   }
-  signUpUser(signUpData: SignUpData) {
+
+  signUpUser(signUpData: RegisterFormData): Observable<CognitoUser> {
     const pool = new CognitoUserPool(PoolData);
     var attributeList = []
     attributeList.push(new CognitoUserAttribute({
       Name: 'email',
-      Value: signUpData.emailAddress
+      Value: signUpData.email
     }));
     attributeList.push(new CognitoUserAttribute({
       Name: 'given_name',
@@ -92,6 +93,8 @@ export class CognitoService {
       Name: 'family_name',
       Value: signUpData.lastName
     }));
+
+    let registerSubject = new Subject<CognitoUser>();
     pool.signUp(
       signUpData.username,
       signUpData.password,
@@ -99,14 +102,18 @@ export class CognitoService {
       null,
       (err: Error, result: ISignUpResult) => {
         if (err) {
-          alert(err);
+          console.log(err);
+          registerSubject.error('there was an error registering');
           return;
         }
         console.log('successfully signed up user', result.user);
         console.log('username', result.user.getUsername());
+        registerSubject.next(result.user);
       }
-    )
+    );
+    return registerSubject.asObservable();
   }
+  
   logoutUser(user: CognitoUser, logoutGlobally: boolean = false) {
     if (logoutGlobally) {
       user.signOut();
