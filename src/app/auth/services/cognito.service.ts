@@ -1,9 +1,12 @@
 import { Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
 
-import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult } from 'amazon-cognito-identity-js';
+import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { environment } from '../../../environments/environment';
 import { RegisterFormData } from '../models/registerformdata';
+import * as fromAuth from '../reducers/auth.reducer';
+import * as actions from '../actions/auth.actions';
 
 export const PoolData = {
   ClientId: environment.cognitoAppClientId,
@@ -22,9 +25,9 @@ export interface CognitoLoginInfo {
 })
 export class CognitoService {
 
-  constructor() { }
+  constructor(private store: Store<fromAuth.State>) { }
 
-  loginUser(username: string, password: string) : Observable<CognitoLoginInfo> {
+  loginUserObservable(username: string, password: string) : Observable<CognitoLoginInfo> {
     const authenticationData = {
       Username: username,
       Password: password
@@ -71,11 +74,39 @@ export class CognitoService {
               break;
           }
         }
-
         authSubject.error(err);
       }
     });
     return authSubject.asObservable();
+  }
+
+  loginUser(
+    username: string,
+    password: string,
+    OnSuccess: (result: CognitoUserSession, cognitoUser: CognitoUser) => any,
+    OnFailure: (err: any, cognitoUser: CognitoUser) => any
+  ): void {
+    const authenticationData = {
+      Username: username,
+      Password: password
+    };
+    const authenticationDetails = new AuthenticationDetails(authenticationData);
+    const poolData = PoolData;
+    const userPool = new CognitoUserPool(poolData);
+    const userData = {
+      Username: username,
+      Pool: userPool
+    };
+    const cognitoUser = new CognitoUser(userData);
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (result) => {
+        OnSuccess(result, cognitoUser);
+      },
+      onFailure: (err) => {
+        OnFailure(err, cognitoUser);
+      }
+    });
   }
 
   signUpUser(signUpData: RegisterFormData): Observable<CognitoUser> {
@@ -123,5 +154,15 @@ export class CognitoService {
         onFailure: (err) => new Error(`error signing out. ${err}`)
       });
     }
+  }
+
+  sendConfirmationCode(
+    user: CognitoUser,
+    code: string,
+    callback: (err: any, result: any) => any
+  ): void {
+    user.confirmRegistration(code, true, (err: any, result: any) => {
+      callback(err, result);
+    })
   }
 }

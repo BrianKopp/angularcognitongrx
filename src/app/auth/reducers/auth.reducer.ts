@@ -3,9 +3,8 @@ import * as actions from '../actions/auth.actions';
 import * as fromRoot from '../../reducers';
 
 export interface State {
-  LoggedIn: boolean;
-  LoggingIn: boolean;
-  LoggingOut: boolean;
+  Loading: boolean;
+  CognitoState: actions.CognitoStates;
   CurrentUser: CognitoUser | null;
   AccessToken: string | null;
   IdToken: string | null;
@@ -13,9 +12,8 @@ export interface State {
 }
 
 const initialState: State = {
-  LoggedIn: false,
-  LoggingIn: false,
-  LoggingOut: false,
+  Loading: false,
+  CognitoState: actions.CognitoStates.LOGGED_OUT,
   CurrentUser: null,
   AccessToken: null,
   IdToken: null,
@@ -24,60 +22,38 @@ const initialState: State = {
 
 export function reducer(state: State = initialState, action: actions.Actions): State {
   switch(action.type) {
-    case actions.LOGIN_USER:
-      return {...state, LoggingIn: true};
+    case actions.AUTH_LOADING:
+      return {
+        ...state,
+        Loading: true
+      };
+    case actions.AUTH_ERROR:
+      const authError = action as actions.AuthErrorAction;
+      return {
+        ...state,
+        ErrorMessage: authError.payload.error,
+        Loading: false
+      };
     case actions.LOGIN_USER_SUCCESS:
       const sa = action as actions.LoginUserSuccessAction;
       return {
         ...state,
-        LoggingIn: false,
-        LoggedIn: true,
+        CognitoState: actions.CognitoStates.LOGGED_IN,
+        Loading: false,
         CurrentUser: sa.payload.user,
         AccessToken: sa.payload.accessToken,
         IdToken: sa.payload.idToken,
         ErrorMessage: null
       };
-    case actions.LOGIN_USER_ERROR:
-      const ea = action as actions.LoginUserErrorAction;
-      return {
-        ...state,
-        LoggingIn: false,
-        LoggedIn: false,
-        CurrentUser: null,
-        AccessToken: null,
-        IdToken: null,
-        ErrorMessage: ea.payload.error
-      };
-    case actions.LOGOUT_USER:
-      return {
-        ...state,
-        LoggingOut: true
-      };
     case actions.LOGOUT_USER_SUCCESS:
+      return initialState;
+    case actions.CONFIRMATION_REQUIRED:
+      const confAction = action as actions.ConfirmationRequiredAction;
       return {
         ...state,
-        LoggedIn: false,
-        LoggingOut: false,
-        CurrentUser: null,
-        AccessToken: null,
-        IdToken: null
-      }
-    case actions.LOGOUT_USER_ERROR:
-      return {
-        ...state,
-        LoggingOut: false
-      };
-    case actions.SIGNUP_USER_ERROR:
-      const a = action as actions.SignupUserErrorAction;
-      return {
-        ...state,
-        ErrorMessage: a.payload.error
-      }
-    case actions.SIGNUP_USER_SUCCESS:
-      const sus = action as actions.SignupUserSuccessAction;
-      return {
-        ...state,
-        CurrentUser: sus.payload.user,
+        CognitoState: actions.CognitoStates.CONFIRMATION_REQUIRED,
+        Loading: false,
+        CurrentUser: confAction.payload.user,
         ErrorMessage: null
       }
     default: return state;
@@ -88,7 +64,17 @@ export interface AuthState extends fromRoot.State {
   auth: State;
 }
 
-export const isAuthenticated = (state: AuthState) => state.auth.LoggedIn;
-export const getAuthenticatedUser = (state: AuthState) => state.auth.CurrentUser;
-export const isLoading = (state: AuthState) => state.auth.LoggingIn || state.auth.LoggingOut;
+export const isAuthenticated = (state: AuthState) => state.auth.CognitoState === actions.CognitoStates.LOGGED_IN;
+export const getAuthenticatedUser = (state: AuthState) => {
+  if (state.auth.CognitoState === actions.CognitoStates.LOGGED_IN) {
+    return state.auth.CurrentUser;
+  } else {
+    return null;
+  }
+}
+export const getUser = (state: AuthState) => state.auth.CurrentUser;
+export const isLoading = (state: AuthState) => state.auth.Loading;
 export const getError = (state: AuthState) => state.auth.ErrorMessage;
+export const getCognitoState = (state: AuthState) => state.auth.CognitoState;
+export const waitingOnConfirmationCode = (state: AuthState) => state.auth.CognitoState === actions.CognitoStates.CONFIRMATION_REQUIRED;
+export const passwordResetRequired = (state: AuthState) => state.auth.CognitoState === actions.CognitoStates.NEW_PASSWORD_REQUIRED;

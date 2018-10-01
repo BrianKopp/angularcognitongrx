@@ -1,0 +1,17 @@
+<mat-card>
+  <mat-card-title>Confirmation Code</mat-card-title>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <p>
+      <mat-form-field>
+        <input type="text" matInput placeholder="123456" formControlName="Confirmation">
+      </mat-form-field>
+    </p>
+    <p *ngIf="errorMessage" class="errorMessage">
+      {{ errorMessage }}
+    </p>
+    <p class="submitButton">
+      <button type="submit" mat-button>Submit</button>
+      <button (click)="resendCode()" mat-button>Resend Code</button>
+    </p>
+  </form>
+</mat-card>

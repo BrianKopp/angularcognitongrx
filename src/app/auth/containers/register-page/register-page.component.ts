@@ -3,7 +3,6 @@ import { Store, select } from '@ngrx/store';
 
 import * as fromAuth from '../../reducers/auth.reducer';
 import { RegisterFormData } from '../../models/registerformdata';
-import { SignupUserAction } from '../../actions/auth.actions';
 
 @Component({
   selector: 'app-register-page',
@@ -19,6 +18,5 @@ export class RegisterPageComponent implements OnInit {
   }
 
   onSubmit(formData: RegisterFormData) {
-    this.store.dispatch(new SignupUserAction({data: formData}));
   }
 }
