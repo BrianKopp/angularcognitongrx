@@ -35,7 +35,7 @@ export class AuthorizationEffects {
             accessToken: info.accessToken,
             idToken: info.idToken
           })),
-          catchError(err => of(new LoginUserErrorAction({error: 'wtf'})))
+          catchError(err => of(new LoginUserErrorAction({error: err})))
         )
       ),
       // map(action => action.payload),

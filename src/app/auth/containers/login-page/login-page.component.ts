@@ -3,7 +3,6 @@ import { Store, select } from '@ngrx/store';
 
 import { Credentials } from '../../models/credentials';
 import { LoginUserAction } from '../../actions/auth.actions';
-import { map } from 'rxjs/operators';
 import * as fromAuth from '../../reducers/auth.reducer';
 
 @Component({
@@ -14,7 +13,7 @@ import * as fromAuth from '../../reducers/auth.reducer';
 export class LoginPageComponent implements OnInit {
   error$ = this.store.pipe(select(fromAuth.getError));
 
-  constructor(private store: Store<fromAuth.State>) { }
+  constructor(private store: Store<fromAuth.AuthState>) { }
 
   ngOnInit() {
   }

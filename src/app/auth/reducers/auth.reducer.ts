@@ -1,6 +1,6 @@
 import { CognitoUser } from "amazon-cognito-identity-js";
 import * as actions from '../actions/auth.actions';
-
+import * as fromRoot from '../../reducers';
 
 export interface State {
   LoggedIn: boolean;
@@ -46,7 +46,7 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         CurrentUser: null,
         AccessToken: null,
         IdToken: null,
-        ErrorMessage: 'Super error'
+        ErrorMessage: ea.payload.error
       };
     case actions.LOGOUT_USER:
       return {
@@ -71,7 +71,11 @@ export function reducer(state: State = initialState, action: actions.Actions): S
   }
 }
 
-export const isAuthenticated = (state: State) => state.LoggedIn;
-export const getAuthenticatedUser = (state: State) => state.CurrentUser;
-export const isLoading = (state: State) => state.LoggingIn || state.LoggingOut;
-export const getError = (state: State) => state.ErrorMessage;
+export interface AuthState extends fromRoot.State {
+  auth: State;
+}
+
+export const isAuthenticated = (state: AuthState) => state.auth.LoggedIn;
+export const getAuthenticatedUser = (state: AuthState) => state.auth.CurrentUser;
+export const isLoading = (state: AuthState) => state.auth.LoggingIn || state.auth.LoggingOut;
+export const getError = (state: AuthState) => state.auth.ErrorMessage;
