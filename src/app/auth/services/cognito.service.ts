@@ -1,7 +1,7 @@
-import { Observable, of, throwError, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult, CognitoUserSession } from 'amazon-cognito-identity-js';
+import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult } from 'amazon-cognito-identity-js';
 import { environment } from '../../../environments/environment';
 import { SignUpData } from '../models/signupdata';
 
@@ -53,8 +53,25 @@ export class CognitoService {
         });
       },
       onFailure: (err) => {
-        console.log('error logging in user:')
-        console.log(err);
+        if (err === undefined || err.code === undefined) {
+          authSubject.error('an unexpected error occurred');
+        } else {
+          switch(err.code) {
+            case 'UserNotConfirmedException':
+            case 'UserNotFoundException':
+            case 'NotAuthorizedException':
+            case 'ResourceNotFoundException':
+              authSubject.error('invalid username or password')
+              break;
+            case 'PasswordResetRequiredException':
+              authSubject.error('password reset required');
+              break;
+            default:
+              authSubject.error('an unexpected error occurred');
+              break;
+          }
+        }
+
         authSubject.error(err);
       }
     });
