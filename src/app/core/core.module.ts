@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AppComponent } from './containers/app.component';
+import { AppComponent } from './containers/app/app.component';
 import { NotFoundPageComponent } from './containers/not-found-page.component';
 import { LayoutComponent } from './components/layout.component';
 import { NavItemComponent } from './components/nav-item.component';

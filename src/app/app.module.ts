@@ -8,7 +8,7 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from '@ngrx/store';
 
 import { CoreModule } from './core/core.module';
-import { AppComponent } from './core/containers/app.component';
+import { AppComponent } from './core/containers/app/app.component';
 
 import { AuthModule } from './auth/auth.module';
 
