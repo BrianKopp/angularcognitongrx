@@ -14,11 +14,11 @@ import * as layoutActions from '../../actions/layout.actions';
 })
 export class AppComponent implements OnInit {
   showSidenav$: Observable<boolean>;
-  loggenIn$: Observable<boolean>;
+  loggedIn$: Observable<boolean>;
 
   constructor(private store: Store<fromRoot.State>) {
     this.showSidenav$ = this.store.pipe(select(fromRoot.getShowSidenav));
-    this.loggenIn$ = of(false);
+    this.loggedIn$ = this.store.pipe(select(fromAuth.isAuthenticated));
   }
 
   ngOnInit() {
