@@ -1,14 +1,18 @@
-import { getUser } from './../../reducers/auth.reducer';
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
+import { BehaviorSubject } from 'rxjs';
+import { CognitoUserSession, CognitoUser } from 'amazon-cognito-identity-js';
 
 import { Credentials } from '../../models/credentials';
 import * as fromAuth from '../../reducers/auth.reducer';
 import { CognitoService } from '../../services/cognito.service';
-import { AuthLoadingAction, AuthErrorAction, LoginUserSuccessAction, ConfirmationRequiredAction } from '../../actions/auth.actions';
-import { CognitoUserSession, CognitoUser } from 'amazon-cognito-identity-js';
-import { BehaviorSubject } from 'rxjs';
-import { map, tap, withLatestFrom, last } from 'rxjs/operators';
+import {
+  AuthLoadingAction,
+  AuthErrorAction,
+  LoginUserSuccessAction,
+  ConfirmationRequiredAction,
+  ConfirmedRequireLoginAction
+} from '../../actions/auth.actions';
 
 @Component({
   selector: 'app-login-page',
@@ -73,15 +77,29 @@ export class LoginPageComponent implements OnInit {
 
   onSubmitConfirmationCode(formData) {
     this.store.dispatch(new AuthLoadingAction());
-    //this.user$.pipe(withLatestFrom(
-    //withLatestFrom([this.user$]).map();
     this.cognito.sendConfirmationCode(
       this.currentUser,
       formData.Confirmation,
-      (err: any, result: any) => {
+      (err: any, _: any) => {
         if (err) {
           this.store.dispatch(new AuthErrorAction({error: err.message}));
         } else {
+          this.cognito.loginUser(
+            this.currentUser.getUsername(),
+            formData.Password,
+            (result: CognitoUserSession, cognitoUser: CognitoUser) => {
+              this.store.dispatch(new LoginUserSuccessAction({
+                user: cognitoUser,
+                accessToken: result.getAccessToken().getJwtToken(),
+                idToken: result.getIdToken().getJwtToken()
+              }));
+            },
+            (_: any, __: CognitoUser) => {
+              this.store.dispatch(new ConfirmedRequireLoginAction({
+                message: 'validation code correct, invalid password'
+              }));
+            }
+          )
         }
     });
   }
