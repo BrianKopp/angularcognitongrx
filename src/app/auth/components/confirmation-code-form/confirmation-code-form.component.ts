@@ -11,7 +11,8 @@ export class ConfirmationCodeFormComponent implements OnInit {
   @Output() submitted = new EventEmitter<number>();
 
   form: FormGroup = new FormGroup({
-    Confirmation: new FormControl('')
+    Confirmation: new FormControl(''),
+    Password: new FormControl('')
   });
 
   constructor() { }

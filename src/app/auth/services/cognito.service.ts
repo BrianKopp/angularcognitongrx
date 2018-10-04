@@ -109,7 +109,7 @@ export class CognitoService {
     });
   }
 
-  signUpUser(signUpData: RegisterFormData): Observable<CognitoUser> {
+  signUpUser(signUpData: RegisterFormData, callback: (err: Error, result: ISignUpResult) => any): void {
     const pool = new CognitoUserPool(PoolData);
     var attributeList = []
     attributeList.push(new CognitoUserAttribute({
@@ -125,24 +125,14 @@ export class CognitoService {
       Value: signUpData.lastName
     }));
 
-    let registerSubject = new Subject<CognitoUser>();
     pool.signUp(
       signUpData.username,
       signUpData.password,
       attributeList,
       null,
-      (err: Error, result: ISignUpResult) => {
-        if (err) {
-          console.log(err);
-          registerSubject.error(err.message);
-          return;
-        }
-        console.log('successfully signed up user', result.user);
-        console.log('username', result.user.getUsername());
-        registerSubject.next(result.user);
-      }
+      (err: Error, result: ISignUpResult) => callback(err, result)
     );
-    return registerSubject.asObservable();
+    return;
   }
   
   logoutUser(user: CognitoUser, logoutGlobally: boolean = false) {

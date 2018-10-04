@@ -1,11 +1,10 @@
 import { Injectable } from "@angular/core";
-import { Actions, Effect, ofType } from '@ngrx/effects';
-import { CognitoService } from '../services/cognito.service';
-import { LOGIN_USER_SUCCESS, LoginUserSuccessAction } from "../actions/auth.actions";
 import { Router } from "@angular/router";
-import { tap, map } from "rxjs/operators";
-import { Observable } from "rxjs";
-import { Action } from "@ngrx/store";
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { tap } from "rxjs/operators";
+
+import { LOGIN_USER_SUCCESS, CONFIRMED_REQUIRE_LOGIN_ACTION } from "../actions/auth.actions";
+import { CognitoService } from '../services/cognito.service';
 
 @Injectable()
 export class AuthorizationEffects {
@@ -19,5 +18,11 @@ export class AuthorizationEffects {
     loginSuccess$ = this.actions.pipe(
       ofType(LOGIN_USER_SUCCESS),
       tap(_ => this.router.navigate(['/']))
+    );
+
+    @Effect({dispatch: false})
+    confirmedRequireLoginRedirectEffect = this.actions.pipe(
+      ofType(CONFIRMED_REQUIRE_LOGIN_ACTION),
+      tap(_ => this.router.navigate(['/login']))
     );
 }

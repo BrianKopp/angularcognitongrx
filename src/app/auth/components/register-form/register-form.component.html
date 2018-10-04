@@ -4,32 +4,32 @@
     <form [formGroup]="form" (ngSubmit)="submit()">
       <p>
         <mat-form-field>
-          <input type="text" matInput placeholder="Username" formControlName="username">
+          <input type="text" matInput placeholder="Username" formControlName="username" autocomplete="username">
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="text" matInput placeholder="First name" formControlName="lastName">
+          <input type="text" matInput placeholder="First name" formControlName="lastName" autocomplete="given-name">
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="text" matInput placeholder="Last name" formControlName="firstName">
+          <input type="text" matInput placeholder="Last name" formControlName="firstName" autocomplete="family-name">
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="email" matInput placeholder="Email" formControlName="email">
+          <input type="email" matInput placeholder="Email" formControlName="email" autocomplete="email">
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="password" matInput placeholder="Password" formControlName="password">
+          <input type="password" matInput placeholder="Password" formControlName="password" autocomplete="new-password">
         </mat-form-field>
       </p>
       <p>
         <mat-form-field>
-          <input type="password" matInput placeholder="Confirm Pasword" formControlName="passwordConfirm">
+          <input type="password" matInput placeholder="Confirm Pasword" formControlName="passwordConfirm" autocomplete="new-password">
         </mat-form-field>
       </p>
       <p *ngIf="errorMessage" class="registerError">
@@ -37,6 +37,7 @@
         </p>
       <p class="registerButtons">
         <button type="submit" mat-button>Sign-up</button>
+        <button routerLink="/login" mat-button>Log In (already signed up)</button>
       </p>
     </form>
   </mat-card-content>

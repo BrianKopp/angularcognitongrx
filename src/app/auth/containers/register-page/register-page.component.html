@@ -1,4 +1,12 @@
-<app-register-form
-  (submitted)="onSubmit($event)"
-  [errorMessage]="error$ | async">
-</app-register-form>
+<div *ngIf="!(confirmationCodeRequired$ | async)">
+  <app-register-form
+    (submitted)="onSubmitSignUp($event)"
+    [errorMessage]="error$ | async">
+  </app-register-form>
+</div>
+<div *ngIf="(confirmationCodeRequired$ | async)">
+  <app-confirmation-code-form
+    (submitted)="onSubmitConfirmationCode($event)"
+    [errorMessage]="error$ | async">
+  </app-confirmation-code-form>
+</div>

@@ -56,6 +56,12 @@ export function reducer(state: State = initialState, action: actions.Actions): S
         CurrentUser: confAction.payload.user,
         ErrorMessage: null
       }
+    case actions.CONFIRMED_REQUIRE_LOGIN_ACTION:
+      const confReqLogin = action as actions.ConfirmedRequireLoginAction;
+      return {
+        ...initialState,
+        ErrorMessage: confReqLogin.payload.message
+      };
     default: return state;
   }
 }

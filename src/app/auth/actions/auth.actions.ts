@@ -20,6 +20,8 @@ export const LOGOUT_USER_SUCCESS = createActionType('LOGOUT_USER_SUCCESS');
 
 export const CONFIRMATION_REQUIRED = createActionType(CognitoStates.CONFIRMATION_REQUIRED);
 
+export const CONFIRMED_REQUIRE_LOGIN_ACTION = createActionType('CONFIRMED_REQUIRE_LOGIN_ACTION');
+
 export class AuthLoadingAction implements Action {
   public type: string = AUTH_LOADING;
   constructor() {}
@@ -45,9 +47,15 @@ export class ConfirmationRequiredAction implements Action {
   constructor(public payload: {user: CognitoUser}) {}
 }
 
+export class ConfirmedRequireLoginAction implements Action {
+  public type: string = CONFIRMED_REQUIRE_LOGIN_ACTION;
+  constructor(public payload: {message: string}) {}
+}
+
 export type Actions =
     AuthLoadingAction
     | AuthErrorAction
     | LoginUserSuccessAction
     | LogoutUserSuccessAction
-    | ConfirmationRequiredAction;
+    | ConfirmationRequiredAction
+    | ConfirmedRequireLoginAction;
