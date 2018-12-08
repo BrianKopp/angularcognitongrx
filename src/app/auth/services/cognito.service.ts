@@ -1,158 +1,194 @@
-import { Observable, Subject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-
-import { CognitoUser, AuthenticationDetails, CognitoUserPool, CognitoUserAttribute, ISignUpResult, CognitoUserSession } from 'amazon-cognito-identity-js';
-import { environment } from '../../../environments/environment';
-import { RegisterFormData } from '../models/registerformdata';
-import * as fromAuth from '../reducers/auth.reducer';
-import * as actions from '../actions/auth.actions';
-
-export const PoolData = {
-  ClientId: environment.cognitoAppClientId,
-  UserPoolId: environment.cognitoUserPoolId
-};
-
-export interface CognitoLoginInfo {
-  cognitoUser: CognitoUser | null;
-  accessToken: string | null;
-  idToken: string | null;
-  error: string | null;
-}
+import { Injectable, OnInit, isDevMode } from '@angular/core';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { LoginResponse, LoginResponseCode } from '../model/login-response';
+import {
+  CognitoUser,
+  CognitoUserPool,
+  AuthenticationDetails,
+  CognitoUserSession,
+  CognitoUserAttribute,
+  ISignUpResult
+} from 'amazon-cognito-identity-js';
+import * as DevEnv from 'src/environments/environment';
+import * as ProdEnv from 'src/environments/environment.prod';
+import { SignupResponse } from '../model/signup-response';
+import { ConfirmationCodeResponse } from '../model/confirmation-code-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CognitoService {
-
-  constructor(private store: Store<fromAuth.State>) { }
-
-  loginUserObservable(username: string, password: string) : Observable<CognitoLoginInfo> {
-    const authenticationData = {
-      Username: username,
-      Password: password
-    };
-    const authenticationDetails = new AuthenticationDetails(authenticationData);
-    const poolData = PoolData;
-    const userPool = new CognitoUserPool(poolData);
-    const userData = {
-      Username: username,
-      Pool: userPool
-    };
-    const cognitoUser = new CognitoUser(userData);
-
-    // create a subject for this
-    let authSubject = new Subject<CognitoLoginInfo>();
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        const accessToken = result.getAccessToken().getJwtToken();
-        const idToken = result.getIdToken().getJwtToken();
-        console.log(`successfully logged in user ${cognitoUser.getUsername()}`);
-        authSubject.next({
-          cognitoUser: cognitoUser,
-          accessToken: accessToken,
-          idToken: idToken,
-          error: null
-        });
-      },
-      onFailure: (err) => {
-        if (err === undefined || err.code === undefined) {
-          authSubject.error('an unexpected error occurred');
-        } else {
-          switch(err.code) {
-            case 'UserNotConfirmedException':
-            case 'UserNotFoundException':
-            case 'NotAuthorizedException':
-            case 'ResourceNotFoundException':
-              authSubject.error('invalid username or password')
-              break;
-            case 'PasswordResetRequiredException':
-              authSubject.error('password reset required');
-              break;
-            default:
-              authSubject.error('an unexpected error occurred');
-              break;
-          }
-        }
-        authSubject.error(err);
-      }
-    });
-    return authSubject.asObservable();
-  }
-
-  loginUser(
-    username: string,
-    password: string,
-    OnSuccess: (result: CognitoUserSession, cognitoUser: CognitoUser) => any,
-    OnFailure: (err: any, cognitoUser: CognitoUser) => any
-  ): void {
-    const authenticationData = {
-      Username: username,
-      Password: password
-    };
-    const authenticationDetails = new AuthenticationDetails(authenticationData);
-    const poolData = PoolData;
-    const userPool = new CognitoUserPool(poolData);
-    const userData = {
-      Username: username,
-      Pool: userPool
-    };
-    const cognitoUser = new CognitoUser(userData);
-
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        OnSuccess(result, cognitoUser);
-      },
-      onFailure: (err) => {
-        OnFailure(err, cognitoUser);
-      }
-    });
-  }
-
-  signUpUser(signUpData: RegisterFormData, callback: (err: Error, result: ISignUpResult) => any): void {
-    const pool = new CognitoUserPool(PoolData);
-    var attributeList = []
-    attributeList.push(new CognitoUserAttribute({
-      Name: 'email',
-      Value: signUpData.email
-    }));
-    attributeList.push(new CognitoUserAttribute({
-      Name: 'given_name',
-      Value: signUpData.firstName
-    }));
-    attributeList.push(new CognitoUserAttribute({
-      Name: 'family_name',
-      Value: signUpData.lastName
-    }));
-
-    pool.signUp(
-      signUpData.username,
-      signUpData.password,
-      attributeList,
-      null,
-      (err: Error, result: ISignUpResult) => callback(err, result)
-    );
-    return;
-  }
-  
-  logoutUser(user: CognitoUser, logoutGlobally: boolean = false) {
-    if (logoutGlobally) {
-      user.signOut();
+  private poolData: { ClientId: string; UserPoolId: string };
+  constructor() {
+    if (isDevMode) {
+      this.poolData = {
+        ClientId: DevEnv.environment.cognitoAppClientId,
+        UserPoolId: DevEnv.environment.cognitoUserPoolId
+      };
     } else {
-      user.globalSignOut({
-        onSuccess: (msg) => { return; },
-        onFailure: (err) => new Error(`error signing out. ${err}`)
-      });
+      this.poolData = {
+        ClientId: ProdEnv.environment.cognitoAppClientId,
+        UserPoolId: ProdEnv.environment.cognitoUserPoolId
+      };
     }
   }
 
-  sendConfirmationCode(
-    user: CognitoUser,
-    code: string,
-    callback: (err: any, result: any) => any
-  ): void {
-    user.confirmRegistration(code, true, (err: any, result: any) => {
-      callback(err, result);
-    })
+  createUserWithCredentials(username: string): CognitoUser {
+    return new CognitoUser({
+      Username: username,
+      Pool: new CognitoUserPool(this.poolData)
+    });
+  }
+
+  createAuthDetails(username: string, password: string): AuthenticationDetails {
+    return new AuthenticationDetails({
+      Username: username,
+      Password: password
+    });
+  }
+
+  loginUser(username: string, password: string): Observable<LoginResponse> {
+    return Observable.create((loginSubject: Subject<LoginResponse>) => {
+      const cognitoUser = this.createUserWithCredentials(username);
+      const authDetails = this.createAuthDetails(username, password);
+      cognitoUser.authenticateUser(authDetails, {
+        onSuccess: (result: CognitoUserSession) => {
+          const accessToken = result.getAccessToken().getJwtToken();
+          const idToken = result.getIdToken().getJwtToken();
+          loginSubject.next({
+            code: LoginResponseCode.SUCCESS,
+            user: cognitoUser,
+            accessToken,
+            idToken
+          });
+        },
+        onFailure: err => {
+          if (err === undefined || err.code === undefined) {
+            loginSubject.next({
+              code: LoginResponseCode.UNKNOWN
+            });
+          } else {
+            switch (err.code) {
+              case 'UserNotConfirmedException':
+                loginSubject.next({
+                  code: LoginResponseCode.NOT_CONFIRMED
+                });
+                break;
+              case 'UserNotFoundException':
+              case 'NotAuthorizedException':
+              case 'ResourceNotFoundException':
+                loginSubject.next({
+                  code: LoginResponseCode.INVALID_CREDENTIALS
+                });
+                break;
+              case 'PasswordResetRequiredException':
+                loginSubject.next({
+                  code: LoginResponseCode.REQUIRE_PASSWORD_RESET
+                });
+                break;
+              default:
+                loginSubject.next({
+                  code: LoginResponseCode.UNKNOWN
+                });
+                break;
+            }
+          }
+        },
+        mfaRequired: response => {
+          console.log('mfa required');
+          console.log(response);
+          loginSubject.next({
+            code: LoginResponseCode.MFA_REQUIRED,
+            user: cognitoUser,
+            authData: authDetails
+          });
+        },
+        newPasswordRequired: response => {
+          console.log('new password required');
+          console.log(response);
+          loginSubject.next({
+            code: LoginResponseCode.REQUIRE_PASSWORD_RESET,
+            user: cognitoUser,
+            authData: authDetails
+          });
+        }
+      });
+    });
+  }
+
+  signupUser(
+    username: string,
+    password: string,
+    email: string,
+    attributes?: { [key: string]: string }
+  ): Observable<SignupResponse> {
+    return Observable.create((signupSubject: Subject<SignupResponse>) => {
+      const poolData = new CognitoUserPool(this.poolData);
+      const attributeList = [
+        new CognitoUserAttribute({
+          Name: 'email',
+          Value: email
+        })
+      ];
+
+      if (attributes) {
+        Object.keys(attributes).forEach((attributeName: string) => {
+          attributeList.push(
+            new CognitoUserAttribute({
+              Name: attributeName,
+              Value: attributes[attributeName]
+            })
+          );
+        });
+      }
+
+      poolData.signUp(username, password, attributeList, null, (err: Error, result: ISignUpResult) => {
+        if (err) {
+          signupSubject.next({ errorMessage: err.message });
+        } else {
+          signupSubject.next({
+            user: result.user,
+            userIsConfirmed: result.userConfirmed,
+            authDetails: new AuthenticationDetails({ Username: username, Password: password })
+          });
+        }
+      });
+    });
+  }
+
+  logoutUser(user: CognitoUser): void {
+    user.signOut();
+  }
+
+  submitConfirmationCode(user: CognitoUser, code: string): Observable<ConfirmationCodeResponse> {
+    return Observable.create((confirmationSubject: Subject<ConfirmationCodeResponse>) => {
+      user.confirmRegistration(code, true, (err: any, _: any) => {
+        if (err) {
+          confirmationSubject.next({ errorMessage: err, success: false });
+        } else {
+          confirmationSubject.next({ success: true });
+        }
+      });
+    });
+  }
+
+  submitMfaCode(user: CognitoUser, code: string): Observable<LoginResponse> {
+    return Observable.create((confirmationSubject: Subject<LoginResponse>) => {
+      user.sendMFACode(code, {
+        onSuccess: (session: CognitoUserSession) => {
+          confirmationSubject.next({
+            code: LoginResponseCode.SUCCESS,
+            user,
+            accessToken: session.getAccessToken().getJwtToken(),
+            idToken: session.getAccessToken().getJwtToken()
+          });
+        },
+        onFailure: (_: any) => {
+          confirmationSubject.next({
+            code: LoginResponseCode.MFA_REQUIRED
+          });
+        }
+      });
+    });
   }
 }
