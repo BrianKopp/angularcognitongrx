@@ -9,7 +9,7 @@
     >
       Protected Content Link 1
     </app-nav-item>
-    <app-nav-item (navigate)="closeSidenav()" *ngIf="!(loggedIn$ | async)"> Sign In </app-nav-item>
+    <app-nav-item (navigate)="closeSidenav()" *ngIf="!(isLoggedIn$ | async)"> Sign In </app-nav-item>
     <app-nav-item (navigate)="logout()" *ngIf="(isLoggedIn$ | async)"> Sign Out </app-nav-item>
     <app-nav-item (navigate)="closeSidenav()"> Close </app-nav-item>
   </app-sidenav>
