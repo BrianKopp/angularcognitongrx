@@ -1,28 +1,24 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-confirmation-code-form',
   templateUrl: './confirmation-code-form.component.html',
   styleUrls: ['./confirmation-code-form.component.css']
 })
-export class ConfirmationCodeFormComponent implements OnInit {
+export class ConfirmationCodeFormComponent {
   @Input() errorMessage: string | null;
-  @Output() submitted = new EventEmitter<number>();
+  @Output() submitEvent = new EventEmitter<{ confirmationCode: string }>();
 
-  form: FormGroup = new FormGroup({
-    Confirmation: new FormControl(''),
-    Password: new FormControl('')
+  confirmationForm: FormGroup = new FormGroup({
+    confirmationCode: new FormControl('', [Validators.required])
   });
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   submit() {
-    if (this.form.valid) {
-      this.submitted.emit(this.form.value);
+    if (this.confirmationForm.valid) {
+      this.submitEvent.emit(this.confirmationForm.value);
     }
   }
 }

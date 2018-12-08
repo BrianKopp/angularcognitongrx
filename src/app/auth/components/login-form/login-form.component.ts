@@ -1,29 +1,25 @@
-import { Credentials } from './../../models/credentials';
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
-export class LoginFormComponent implements OnInit {
+export class LoginFormComponent {
   @Input() errorMessage: string | null;
-  @Output() submitted = new EventEmitter<Credentials>();
-  
-  form: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
+  @Output() submitEvent = new EventEmitter<{ username: string; password: string }>();
+
+  loginForm: FormGroup = new FormGroup({
+    username: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required])
   });
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   submit() {
-    if (this.form.valid) {
-      this.submitted.emit(this.form.value);
+    if (this.loginForm.valid) {
+      this.submitEvent.emit(this.loginForm.value);
     }
   }
 }

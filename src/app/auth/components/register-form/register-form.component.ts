@@ -1,29 +1,25 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-import { RegisterFormData } from '../../models/registerformdata';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-register-form',
   templateUrl: './register-form.component.html',
   styleUrls: ['./register-form.component.css']
 })
-export class RegisterFormComponent implements OnInit {
+export class RegisterFormComponent {
   @Input() errorMessage: string | null;
-  @Output() submitted = new EventEmitter<RegisterFormData>();
+  @Output() submitted = new EventEmitter();
 
   form: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    email: new FormControl(''),
-    password: new FormControl(''),
-    passwordConfirm: new FormControl(''),
-    firstName: new FormControl(''),
-    lastName: new FormControl('')
+    username: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
+    passwordConfirm: new FormControl('', [Validators.required]),
+    firstName: new FormControl('', [Validators.required]),
+    lastName: new FormControl('', [Validators.required])
   });
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   submit() {
     if (this.form.valid) {

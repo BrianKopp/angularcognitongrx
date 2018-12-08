@@ -1,12 +1,6 @@
-<div *ngIf="!(confirmationCodeRequired$ | async)">
-  <app-login-form
-    (submitted)="onSubmitLogin($event)"
-    [errorMessage]="error$ | async">
-  </app-login-form>
-</div>
-<div *ngIf="(confirmationCodeRequired$ | async)">
-  <app-confirmation-code-form
-    (submitted)="onSubmitConfirmationCode($event)"
-    [errorMessage]="error$ | async">
-  </app-confirmation-code-form>
-</div>
+<ng-container *ngIf="(authState$ | async) === authStates.NOT_LOGGED_IN">
+  <app-login-form [errorMessage]="errorMessage$ | async" (submitEvent)="onSubmitLogin($event)"> </app-login-form>
+</ng-container>
+<ng-container *ngIf="(authState$ | async) === authStates.REQUIRE_CONFIRMATION">
+  <app-confirmation-code-form (submitEvent)="onSubmitConfirmationCode($event)"></app-confirmation-code-form>
+</ng-container>
