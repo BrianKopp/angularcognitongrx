@@ -8,6 +8,7 @@ import { NavItemComponent } from './components/nav-item.component';
 import { SidenavComponent } from './components/sidenav.component';
 import { ToolbarComponent } from './components/toolbar.component';
 import { MaterialModule } from '../material';
+import { AuthModule } from '../auth/auth.module';
 
 export const COMPONENTS = [
   AppComponent,
@@ -16,14 +17,10 @@ export const COMPONENTS = [
   NavItemComponent,
   SidenavComponent,
   ToolbarComponent
-]
+];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    MaterialModule
-  ],
+  imports: [CommonModule, RouterModule, MaterialModule, AuthModule.forRoot()],
   declarations: [COMPONENTS, LayoutComponent]
 })
-export class CoreModule { }
+export class CoreModule {}
