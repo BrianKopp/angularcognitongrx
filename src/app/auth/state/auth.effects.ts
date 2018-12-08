@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { map, switchMap, catchError, withLatestFrom, tap } from 'rxjs/operators';
+import { map, switchMap, catchError, withLatestFrom, tap, concatMap } from 'rxjs/operators';
 import { CognitoService } from '../services/cognito.service';
 import * as Auth from './auth.actions';
 import { LoginResponse, LoginResponseCode } from '../model/login-response';
@@ -11,6 +11,7 @@ import { AuthFacade } from './auth.facade';
 import { CognitoUser } from 'amazon-cognito-identity-js';
 import { Store } from '@ngrx/store';
 import { AuthState } from './auth.reducer';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthEffects {
@@ -18,7 +19,8 @@ export class AuthEffects {
     private actions$: Actions,
     private store: Store<AuthState>,
     private cognitoService: CognitoService,
-    private authFacade: AuthFacade
+    private authFacade: AuthFacade,
+    private router: Router
   ) {}
 
   @Effect()
@@ -29,12 +31,12 @@ export class AuthEffects {
       const authDetails = this.cognitoService.createAuthDetails(username, password);
       this.store.dispatch(new Auth.LoginWaitingAction({ user, authDetails }));
     }),
-    switchMap(({ username, password }) => {
+    switchMap(({ username, password, redirectUrl }) => {
       return this.cognitoService.loginUser(username, password).pipe(
         map(response => {
           switch (response.code) {
             case LoginResponseCode.SUCCESS:
-              return new Auth.LoginSuccessAction();
+              return new Auth.LoginSuccessAction({ redirectUrl });
             case LoginResponseCode.INVALID_CREDENTIALS:
               return new Auth.LoginFailureAction({ errorMessage: 'Incorrect username or password' });
             case LoginResponseCode.MFA_REQUIRED:
@@ -50,6 +52,12 @@ export class AuthEffects {
         }),
         catchError(error => of(new Auth.LoginFailureAction({ errorMessage: error })))
       );
+    })
+  );
+
+  loginSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.LOGIN_SUCCESS)).pipe(
+    map((action: Auth.LoginSuccessAction) => {
+      this.router.navigate([action.payload.redirectUrl || '/']);
     })
   );
 

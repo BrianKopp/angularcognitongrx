@@ -47,7 +47,7 @@ export class SetTokensAction implements Action {
 }
 export class LoginAction implements Action {
   readonly type = AuthActionTypes.LOGIN;
-  constructor(public payload: { username: string; password: string }) {}
+  constructor(public payload: { username: string; password: string; redirectUrl?: string }) {}
 }
 
 export class LoginWaitingAction implements Action {
@@ -57,7 +57,7 @@ export class LoginWaitingAction implements Action {
 
 export class LoginSuccessAction implements Action {
   readonly type = AuthActionTypes.LOGIN_SUCCESS;
-  constructor() {}
+  constructor(public payload: { redirectUrl?: string }) {}
 }
 
 export class LoginFailureAction implements Action {
