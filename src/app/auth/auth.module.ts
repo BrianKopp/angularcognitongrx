@@ -1,5 +1,5 @@
 import { StoreModule } from '@ngrx/store';
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
@@ -18,6 +18,8 @@ import { AuthGuard } from './services/auth-guard.service';
 import { AuthFacade } from './state/auth.facade';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material';
 import { ToastService } from './services/toast.service';
+import { CognitoConfig } from './model/cognito-config';
+import { CognitoConfigService } from './services/cognito-config-service';
 
 @NgModule({
   imports: [
@@ -39,10 +41,10 @@ import { ToastService } from './services/toast.service';
   providers: [ToastService]
 })
 export class AuthModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(cognitoConfig: CognitoConfig): ModuleWithProviders {
     return {
       ngModule: AuthModule,
-      providers: [AuthGuard, AuthFacade]
+      providers: [AuthGuard, AuthFacade, { provide: CognitoConfigService, useValue: cognitoConfig }]
     };
   }
 }

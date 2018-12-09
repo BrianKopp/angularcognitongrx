@@ -20,7 +20,7 @@ export const COMPONENTS = [
 ];
 
 @NgModule({
-  imports: [CommonModule, RouterModule, MaterialModule, AuthModule.forRoot()],
+  imports: [CommonModule, RouterModule, MaterialModule, AuthModule.forRoot({ cognitoAppClientId: '', cognitoUserPoolId: '' })],
   declarations: [COMPONENTS, LayoutComponent]
 })
 export class CoreModule {}

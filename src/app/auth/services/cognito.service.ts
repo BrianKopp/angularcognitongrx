@@ -1,5 +1,5 @@
-import { Injectable, OnInit, isDevMode } from '@angular/core';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Injectable, Inject } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { LoginResponse, LoginResponseCode } from '../model/login-response';
 import {
   CognitoUser,
@@ -9,29 +9,22 @@ import {
   CognitoUserAttribute,
   ISignUpResult
 } from 'amazon-cognito-identity-js';
-import * as DevEnv from 'src/environments/environment';
-import * as ProdEnv from 'src/environments/environment.prod';
 import { SignupResponse } from '../model/signup-response';
 import { ConfirmationCodeResponse } from '../model/confirmation-code-response';
 import { LoadUserFromStorageResponse } from '../model/load-user-from-storage-response';
+import { CognitoConfigService } from './cognito-config-service';
+import { CognitoConfig } from '../model/cognito-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CognitoService {
   private poolData: { ClientId: string; UserPoolId: string };
-  constructor() {
-    if (isDevMode) {
-      this.poolData = {
-        ClientId: DevEnv.environment.cognitoAppClientId,
-        UserPoolId: DevEnv.environment.cognitoUserPoolId
-      };
-    } else {
-      this.poolData = {
-        ClientId: ProdEnv.environment.cognitoAppClientId,
-        UserPoolId: ProdEnv.environment.cognitoUserPoolId
-      };
-    }
+  constructor(@Inject(CognitoConfigService) private _: CognitoConfig) {
+    this.poolData = {
+      ClientId: _.cognitoAppClientId,
+      UserPoolId: _.cognitoUserPoolId
+    };
   }
 
   createUserWithCredentials(username: string): CognitoUser {
