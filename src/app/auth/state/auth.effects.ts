@@ -12,6 +12,7 @@ import { CognitoUser } from 'amazon-cognito-identity-js';
 import { Store } from '@ngrx/store';
 import { AuthState } from './auth.reducer';
 import { Router } from '@angular/router';
+import { LoadUserFromStorageResponse } from '../model/load-user-from-storage-response';
 
 @Injectable()
 export class AuthEffects {
@@ -137,6 +138,23 @@ export class AuthEffects {
           }
         }),
         catchError(err => of(new Auth.SubmitMFACodeFailureInvalidAction({ errorMessage: err })))
+      );
+    })
+  );
+
+  @Effect()
+  initAuth$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.INIT_AUTH)).pipe(
+    switchMap(_ => {
+      return this.cognitoService.loadUserFromStorage().pipe(
+        map((response: LoadUserFromStorageResponse) => {
+          if (response.user && response.accessToken && response.idToken) {
+            return new Auth.InitAuthUserRememberedAction({
+              user: response.user,
+              accessToken: response.accessToken,
+              idToken: response.idToken
+            });
+          }
+        })
       );
     })
   );

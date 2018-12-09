@@ -50,6 +50,15 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
           login: true
         }
       };
+    case AuthActionTypes.INIT_AUTH_USER_REMEMBERED:
+      return {
+        ...state,
+        authDetails: null,
+        authState: AuthStates.LOGGED_IN,
+        user: action.payload.user,
+        accessToken: action.payload.accessToken,
+        idToken: action.payload.idToken
+      };
     case AuthActionTypes.LOGIN_SUCCESS:
       return {
         ...state,

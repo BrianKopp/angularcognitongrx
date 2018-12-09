@@ -13,6 +13,7 @@ import * as DevEnv from 'src/environments/environment';
 import * as ProdEnv from 'src/environments/environment.prod';
 import { SignupResponse } from '../model/signup-response';
 import { ConfirmationCodeResponse } from '../model/confirmation-code-response';
+import { LoadUserFromStorageResponse } from '../model/load-user-from-storage-response';
 
 @Injectable({
   providedIn: 'root'
@@ -174,6 +175,29 @@ export class CognitoService {
 
   logoutUser(user: CognitoUser): void {
     user.signOut();
+  }
+
+  loadUserFromStorage(): Observable<LoadUserFromStorageResponse> {
+    return Observable.create((loadUserSubject: Subject<LoadUserFromStorageResponse>) => {
+      const userPool = new CognitoUserPool(this.poolData);
+      const cognitoUser = userPool.getCurrentUser();
+      if (cognitoUser) {
+        cognitoUser.getSession((err: Error, session: CognitoUserSession) => {
+          if (err) {
+            loadUserSubject.next({ errorMessage: err.message });
+          } else {
+            loadUserSubject.next({
+              user: cognitoUser,
+              accessToken: session.getAccessToken().getJwtToken(),
+              idToken: session.getIdToken().getJwtToken()
+            });
+          }
+          loadUserSubject.next({});
+        });
+      } else {
+        loadUserSubject.next({});
+      }
+    });
   }
 
   submitConfirmationCode(user: CognitoUser, code: string): Observable<ConfirmationCodeResponse> {
