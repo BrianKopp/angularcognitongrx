@@ -27,6 +27,9 @@ export class AppComponent implements OnInit {
   openSidenav() {
     this.store.dispatch(new layoutActions.OpenSidenav());
   }
+  login() {
+    this.closeSidenav();
+  }
   logout() {
     this.closeSidenav();
     this.authFacade.logoutUser();

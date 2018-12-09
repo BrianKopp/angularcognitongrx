@@ -6,9 +6,9 @@ import { RegisterPageComponent } from './containers/register-page/register-page.
 import { LoggedInGuard } from './services/loggedin-guard.service';
 
 const routes: Routes = [
-  { path: 'login', component: LoginPageComponent, canActivate: [LoggedInGuard]},
-  { path: 'signup', component: RegisterPageComponent, canActivate: [LoggedInGuard]}
-]
+  { path: 'login', component: LoginPageComponent, canActivate: [LoggedInGuard] },
+  { path: 'signup', component: RegisterPageComponent, canActivate: [LoggedInGuard] }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
