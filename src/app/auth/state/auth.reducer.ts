@@ -40,12 +40,6 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
   switch (action.type) {
     case AuthActionTypes.CLEAR_AUTH:
       return initialState;
-    case AuthActionTypes.SET_TOKENS:
-      return {
-        ...state,
-        accessToken: action.payload.accessToken,
-        idToken: action.payload.idToken
-      };
     case AuthActionTypes.LOGIN_WAITING:
       return {
         ...state,
