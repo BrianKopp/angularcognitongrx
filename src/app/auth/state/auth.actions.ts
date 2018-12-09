@@ -12,7 +12,6 @@ export enum AuthActionTypes {
   SIGNUP = '[Auth] Signup',
   SIGNUP_WAITING = '[Auth] Signup Waiting',
   SIGNUP_SUCCESS = '[Auth] Signup Success',
-  SIGNUP_SUCCESS_REQUIRE_CONFIRMATION = '[Auth] Signup Success, Confirmation Required',
   SIGNUP_FAILURE = '[Auth] Signup Failure',
 
   REQUIRE_MFA = '[Auth] Multi-Factor Authentication Required',
@@ -71,11 +70,6 @@ export class SignupWaitingAction implements Action {
 
 export class SignupSuccessAction implements Action {
   readonly type = AuthActionTypes.SIGNUP_SUCCESS;
-  constructor(public payload: { cognitoUser: CognitoUser }) {}
-}
-
-export class SignupSuccessConfirmationRequiredAction implements Action {
-  readonly type = AuthActionTypes.SIGNUP_SUCCESS_REQUIRE_CONFIRMATION;
   constructor(public payload: { cognitoUser: CognitoUser }) {}
 }
 
@@ -163,7 +157,6 @@ export type AuthActions =
   | SignupAction
   | SignupWaitingAction
   | SignupSuccessAction
-  | SignupSuccessConfirmationRequiredAction
   | SignupFailureAction
   | RequireMFACodeAction
   | RequireUserConfirmationAction

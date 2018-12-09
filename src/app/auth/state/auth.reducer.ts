@@ -96,16 +96,6 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
           signup: false
         }
       };
-    case AuthActionTypes.SIGNUP_SUCCESS_REQUIRE_CONFIRMATION:
-      return {
-        ...state,
-        user: action.payload.cognitoUser,
-        authState: AuthStates.REQUIRE_CONFIRMATION,
-        isLoading: {
-          ...state.isLoading,
-          signup: false
-        }
-      };
     case AuthActionTypes.SIGNUP_FAILURE:
       return {
         ...state,
