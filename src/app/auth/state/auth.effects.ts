@@ -55,11 +55,9 @@ export class AuthEffects {
     })
   );
 
-  loginSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.LOGIN_SUCCESS)).pipe(
-    map((action: Auth.LoginSuccessAction) => {
-      this.router.navigate([action.payload.redirectUrl || '/']);
-    })
-  );
+  loginSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.LOGIN_SUCCESS)).subscribe((action: Auth.LoginSuccessAction) => {
+    this.router.navigate([action.payload.redirectUrl || '']);
+  });
 
   @Effect()
   signup$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.SIGNUP)).pipe(
@@ -67,18 +65,20 @@ export class AuthEffects {
     tap(({ username, password }) => {
       const user = this.cognitoService.createUserWithCredentials(username);
       const authDetails = this.cognitoService.createAuthDetails(username, password);
-      this.store.dispatch(new Auth.SignupWaitingAction({ user, authDetails }));
+      this.store.dispatch(new Auth.SignupWaitingAction({ user }));
     }),
     switchMap(({ username, password, email, attributeData }) => {
       return this.cognitoService.signupUser(username, password, email, attributeData).pipe(
         map((response: SignupResponse) => {
           if (response.errorMessage) {
             return new Auth.SignupFailureAction({ errorMessage: response.errorMessage });
-          } else {
+          } else if (response.userIsConfirmed || response.userIsConfirmed === null) {
             return new Auth.SignupSuccessAction({
-              cognitoUser: response.user,
-              userIsConfirmed: response.userIsConfirmed,
-              authDetails: response.authDetails
+              cognitoUser: response.user
+            });
+          } else {
+            return new Auth.SignupSuccessConfirmationRequiredAction({
+              cognitoUser: response.user
             });
           }
         }),
@@ -116,6 +116,12 @@ export class AuthEffects {
       );
     })
   );
+
+  submitConfirmationCodeSuccess$ = this.actions$
+    .pipe(ofType(Auth.AuthActionTypes.SUBMIT_CONFIRMATION_CODE_SUCCESS))
+    .subscribe((action: Auth.SubmitConfirmationCodeSuccessAction) => {
+      this.router.navigate(['']);
+    });
 
   @Effect()
   submitMfaCode$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.SUBMIT_MFA)).pipe(

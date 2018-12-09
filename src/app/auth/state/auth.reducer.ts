@@ -80,7 +80,6 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
       return {
         ...state,
         user: action.payload.user,
-        authDetails: action.payload.authDetails,
         isLoading: {
           ...state.isLoading,
           signup: false
@@ -89,8 +88,18 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
     case AuthActionTypes.SIGNUP_SUCCESS:
       return {
         ...state,
-        authDetails: null,
+        user: action.payload.cognitoUser,
         authState: AuthStates.LOGGED_IN,
+        isLoading: {
+          ...state.isLoading,
+          signup: false
+        }
+      };
+    case AuthActionTypes.SIGNUP_SUCCESS_REQUIRE_CONFIRMATION:
+      return {
+        ...state,
+        user: action.payload.cognitoUser,
+        authState: AuthStates.REQUIRE_CONFIRMATION,
         isLoading: {
           ...state.isLoading,
           signup: false
@@ -132,6 +141,7 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
     case AuthActionTypes.SUBMIT_CONFIRMATION_CODE_SUCCESS:
       return {
         ...state,
+        authState: AuthStates.LOGGED_IN,
         isLoading: {
           ...state.isLoading,
           confirmationCode: false
