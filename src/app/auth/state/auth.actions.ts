@@ -3,8 +3,6 @@ import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 export enum AuthActionTypes {
   CLEAR_AUTH = '[Auth] Clear Auth',
-
-  INIT_AUTH = '[Auth] Init Auth',
   INIT_AUTH_USER_REMEMBERED = '[Auth] Init Auth User Remembered',
 
   LOGIN = '[Auth] Login',
@@ -42,12 +40,6 @@ export class ClearAuthAction implements Action {
   readonly type = AuthActionTypes.CLEAR_AUTH;
   constructor() {}
 }
-
-export class InitAuthAction implements Action {
-  readonly type = AuthActionTypes.INIT_AUTH;
-  constructor() {}
-}
-
 export class InitAuthUserRememberedAction implements Action {
   readonly type = AuthActionTypes.INIT_AUTH_USER_REMEMBERED;
   constructor(public payload: { user: CognitoUser; accessToken: string; idToken: string }) {}
@@ -170,7 +162,6 @@ export class LogoutSuccessAction implements Action {
 
 export type AuthActions =
   | ClearAuthAction
-  | InitAuthAction
   | InitAuthUserRememberedAction
   | LoginAction
   | LoginWaitingAction

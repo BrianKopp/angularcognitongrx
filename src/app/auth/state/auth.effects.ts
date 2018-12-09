@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, Effect, ofType, ROOT_EFFECTS_INIT } from '@ngrx/effects';
 import { map, switchMap, catchError, withLatestFrom, tap, concatMap } from 'rxjs/operators';
 import { CognitoService } from '../services/cognito.service';
 import * as Auth from './auth.actions';
 import { LoginResponse, LoginResponseCode } from '../model/login-response';
-import { of } from 'rxjs';
+import { of, defer } from 'rxjs';
 import { SignupResponse } from '../model/signup-response';
 import { ConfirmationCodeResponse } from '../model/confirmation-code-response';
 import { AuthFacade } from './auth.facade';
@@ -142,20 +142,23 @@ export class AuthEffects {
     })
   );
 
-  @Effect()
-  initAuth$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.INIT_AUTH)).pipe(
-    switchMap(_ => {
-      return this.cognitoService.loadUserFromStorage().pipe(
-        map((response: LoadUserFromStorageResponse) => {
-          if (response.user && response.accessToken && response.idToken) {
-            return new Auth.InitAuthUserRememberedAction({
+  @Effect({ dispatch: false })
+  initAuth$ = defer(() => {
+    // this.actions$.pipe(ofType(ROOT_EFFECTS_INIT)).pipe(
+    // tap(initAction => {
+    // console.log(initAction);
+    return this.cognitoService.loadUserFromStorage().pipe(
+      map((response: LoadUserFromStorageResponse) => {
+        if (response.user && response.accessToken && response.idToken) {
+          this.store.dispatch(
+            new Auth.InitAuthUserRememberedAction({
               user: response.user,
               accessToken: response.accessToken,
               idToken: response.idToken
-            });
-          }
-        })
-      );
-    })
-  );
+            })
+          );
+        }
+      })
+    );
+  });
 }
