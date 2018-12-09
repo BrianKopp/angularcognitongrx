@@ -99,6 +99,10 @@ export class AuthEffects {
     })
   );
 
+  logoutSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.LOGOUT_SUCCESS)).subscribe(_ => {
+    this.router.navigate(['/login']);
+  });
+
   @Effect()
   submitConfirmationCode$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.SUBMIT_CONFIRMATION_CODE)).pipe(
     map((action: Auth.SubmitConfirmationCodeAction) => action.payload.confirmationCode),
