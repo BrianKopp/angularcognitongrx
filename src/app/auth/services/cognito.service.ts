@@ -144,7 +144,23 @@ export class CognitoService {
 
       poolData.signUp(username, password, attributeList, null, (err: Error, result: ISignUpResult) => {
         if (err) {
-          signupSubject.next({ errorMessage: err.message });
+          let errorMessage = 'An unknown error occurred';
+          if (err['code']) {
+            switch (err['code']) {
+              case 'InvalidParameterException':
+                errorMessage = 'Not all required user properties were provided';
+                break;
+              case 'InvalidPasswordException':
+                errorMessage = err.message;
+                break;
+              case 'UsernameExistsException':
+                errorMessage = err.message;
+                break;
+              default:
+                break;
+            }
+          }
+          signupSubject.next({ errorMessage: errorMessage });
         } else {
           signupSubject.next({
             user: result.user,

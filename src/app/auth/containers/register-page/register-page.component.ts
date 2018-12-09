@@ -15,7 +15,14 @@ export class RegisterPageComponent {
 
   onSubmitSignUp(event) {
     if (event && event.username && event.password && event.email) {
-      this.authFacade.signupUser(event.username, event.password, event.email, {});
+      const attributes: { [key: string]: string } = {};
+      if (event.firstName) {
+        attributes['given_name'] = event.firstName;
+      }
+      if (event.lastName) {
+        attributes['family_name'] = event.lastName;
+      }
+      this.authFacade.signupUser(event.username, event.password, event.email, attributes);
     } else {
       console.log('invalid event data for onSubmitSignUp');
       console.log(event);
