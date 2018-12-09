@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import { AuthState } from './auth.reducer';
 import { Router } from '@angular/router';
 import { LoadUserFromStorageResponse } from '../model/load-user-from-storage-response';
+import { ToastService } from '../services/toast.service';
 
 @Injectable()
 export class AuthEffects {
@@ -21,7 +22,8 @@ export class AuthEffects {
     private store: Store<AuthState>,
     private cognitoService: CognitoService,
     private authFacade: AuthFacade,
-    private router: Router
+    private router: Router,
+    private toaster: ToastService
   ) {}
 
   @Effect()
@@ -58,14 +60,18 @@ export class AuthEffects {
 
   loginSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.LOGIN_SUCCESS)).subscribe((action: Auth.LoginSuccessAction) => {
     this.router.navigate([action.payload.redirectUrl || '']);
+    this.toaster.openSnackBar('sweeeeet', 'loggedin');
+  });
+
+  loadFromInitSuccess$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.INIT_AUTH_USER_REMEMBERED)).subscribe(_ => {
+    this.toaster.openSnackBar('sweeeeet', 'loggedin');
   });
 
   @Effect()
   signup$ = this.actions$.pipe(ofType(Auth.AuthActionTypes.SIGNUP)).pipe(
     map((action: Auth.SignupAction) => action.payload),
-    tap(({ username, password }) => {
+    tap(({ username }) => {
       const user = this.cognitoService.createUserWithCredentials(username);
-      const authDetails = this.cognitoService.createAuthDetails(username, password);
       this.store.dispatch(new Auth.SignupWaitingAction({ user }));
     }),
     switchMap(({ username, password, email, attributeData }) => {
@@ -78,9 +84,7 @@ export class AuthEffects {
               cognitoUser: response.user
             });
           } else {
-            return new Auth.SignupSuccessConfirmationRequiredAction({
-              cognitoUser: response.user
-            });
+            return new Auth.RequireUserConfirmationAction();
           }
         }),
         catchError(err => of(new Auth.SignupFailureAction({ errorMessage: err })))

@@ -2,7 +2,6 @@ import { Action } from '@ngrx/store';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 export enum AuthActionTypes {
-  CLEAR_AUTH = '[Auth] Clear Auth',
   INIT_AUTH_USER_REMEMBERED = '[Auth] Init Auth User Remembered',
 
   LOGIN = '[Auth] Login',
@@ -34,11 +33,6 @@ export enum AuthActionTypes {
 
   LOGOUT = '[Auth] Logout',
   LOGOUT_SUCCESS = '[Auth] Logout SUccess'
-}
-
-export class ClearAuthAction implements Action {
-  readonly type = AuthActionTypes.CLEAR_AUTH;
-  constructor() {}
 }
 export class InitAuthUserRememberedAction implements Action {
   readonly type = AuthActionTypes.INIT_AUTH_USER_REMEMBERED;
@@ -161,7 +155,6 @@ export class LogoutSuccessAction implements Action {
 }
 
 export type AuthActions =
-  | ClearAuthAction
   | InitAuthUserRememberedAction
   | LoginAction
   | LoginWaitingAction

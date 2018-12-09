@@ -38,8 +38,6 @@ export const initialState: AuthState = {
 
 export function authReducer(state = initialState, action: AuthActions): AuthState {
   switch (action.type) {
-    case AuthActionTypes.CLEAR_AUTH:
-      return initialState;
     case AuthActionTypes.LOGIN_WAITING:
       return {
         ...state,
@@ -121,17 +119,32 @@ export function authReducer(state = initialState, action: AuthActions): AuthStat
     case AuthActionTypes.REQUIRE_MFA:
       return {
         ...state,
-        authState: AuthStates.REQUIRE_MFA
+        authState: AuthStates.REQUIRE_MFA,
+        isLoading: {
+          ...state.isLoading,
+          login: false,
+          signup: false
+        }
       };
     case AuthActionTypes.REQUIRE_USER_CONFIRMATION:
       return {
         ...state,
-        authState: AuthStates.REQUIRE_CONFIRMATION
+        authState: AuthStates.REQUIRE_CONFIRMATION,
+        isLoading: {
+          ...state.isLoading,
+          login: false,
+          signup: false
+        }
       };
     case AuthActionTypes.REQUIRE_NEW_PASSWORD:
       return {
         ...state,
-        authState: AuthStates.REQUIRE_NEW_PASSWORD
+        authState: AuthStates.REQUIRE_NEW_PASSWORD,
+        isLoading: {
+          ...state.isLoading,
+          login: false,
+          signup: false
+        }
       };
     case AuthActionTypes.SUBMIT_CONFIRMATION_CODE:
       return {
