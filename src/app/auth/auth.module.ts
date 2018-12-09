@@ -16,12 +16,15 @@ import { authReducer } from './state/auth.reducer';
 import { AuthEffects } from './state/auth.effects';
 import { AuthGuard } from './services/auth-guard.service';
 import { AuthFacade } from './state/auth.facade';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material';
+import { ToastService } from './services/toast.service';
 
 @NgModule({
   imports: [
     CommonModule,
     ReactiveFormsModule,
     MaterialModule,
+    MatSnackBarModule,
     AuthRoutingModule,
     StoreModule.forFeature('auth', authReducer),
     EffectsModule.forFeature([AuthEffects])
@@ -32,7 +35,8 @@ import { AuthFacade } from './state/auth.facade';
     RegisterFormComponent,
     RegisterPageComponent,
     ConfirmationCodeFormComponent
-  ]
+  ],
+  providers: [ToastService]
 })
 export class AuthModule {
   static forRoot(): ModuleWithProviders {
